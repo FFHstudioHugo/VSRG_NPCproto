@@ -1384,7 +1384,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 1
-  m_Speed: 3.5
+  m_Speed: 2.25
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -1418,8 +1418,6 @@ MonoBehaviour:
   agent: {fileID: 5189281668861356691}
   orbitRadius: 10
   orbitSpeed: 0.25
-  LookAt: {fileID: 0}
-  WaitDelay: 0.14
 --- !u!114 &-5680809578450316791
 MonoBehaviour:
   m_ObjectHideFlags: 0

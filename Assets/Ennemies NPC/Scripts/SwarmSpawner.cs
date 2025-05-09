@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.AI;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -39,8 +41,35 @@ public class SwarmSpawner : MonoBehaviour
         for (int i = 0; i < insectCount; i++)
         {
             Vector3 spawnPos = GetRandomPosition();
-            GameObject insect = Instantiate(insectPrefab, spawnPos, Quaternion.identity, transform);
-            swarmManager.Register(insect.GetComponent<SwarmInsect>());
+
+            // Snap to NavMesh
+            if (NavMesh.SamplePosition(spawnPos, out NavMeshHit navHit, 2f, NavMesh.AllAreas))
+            {
+                spawnPos = navHit.position;
+
+                // Align with surface normal using raycast
+                if (Physics.Raycast(spawnPos + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 2f))
+                {
+                    Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+
+                    // Apply random Y rotation around surface normal
+                    Quaternion randomYRotation = Quaternion.AngleAxis(Random.Range(0f, 360f), hit.normal);
+                    Quaternion finalRotation = randomYRotation * rotation;
+
+                    GameObject insect = Instantiate(insectPrefab, spawnPos, finalRotation, transform);
+                    swarmManager.Register(insect.GetComponent<SwarmInsect>());
+                }
+                else
+                {
+                    // fallback: use upright
+                    GameObject insect = Instantiate(insectPrefab, spawnPos, Quaternion.identity, transform);
+                    swarmManager.Register(insect.GetComponent<SwarmInsect>());
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Insect {i} spawn position not on NavMesh.");
+            }
         }
     }
 
